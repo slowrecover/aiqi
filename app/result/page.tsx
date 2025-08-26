@@ -7,6 +7,8 @@ export default function ResultPage() {
   const [correct, setCorrect] = useState<number>(0);
   const [total, setTotal] = useState<number>(10);
   const [shareUrl, setShareUrl] = useState('');
+  const [nickname, setNickname] = useState('');
+  const [showNicknameInput, setShowNicknameInput] = useState(false);
 
   useEffect(() => {
     // Get score from localStorage
@@ -20,8 +22,8 @@ export default function ResultPage() {
       setCorrect(parseInt(savedCorrect || '0'));
       setTotal(parseInt(savedTotal || '10'));
       
-      // Create share URL
-      const url = `${window.location.origin}?challenge=${scoreNum}`;
+      // Create base share URL
+      const url = `${window.location.origin}/share?score=${scoreNum}`;
       setShareUrl(url);
     } else {
       // No score, redirect to test
@@ -85,17 +87,25 @@ export default function ResultPage() {
     return "Bottom 40% (there's nowhere to go but up!)";
   };
 
-  const shareText = `I scored ${score}% on the AI-IQ Test! I'm a certified ${personality.title}. Think you can beat me? ${shareUrl}`;
+  // Update share URL with nickname
+  const updateShareUrl = () => {
+    const baseUrl = `${window.location.origin}/share?score=${score}`;
+    const fullUrl = nickname ? `${baseUrl}&name=${encodeURIComponent(nickname)}` : baseUrl;
+    setShareUrl(fullUrl);
+    return fullUrl;
+  };
 
   const handleShare = (platform: string) => {
+    const url = updateShareUrl();
+    const shareText = `I scored ${score}% on the AI-IQ Test! I'm a certified ${personality.title}. Think you can beat me?`;
     const encodedText = encodeURIComponent(shareText);
-    const encodedUrl = encodeURIComponent(shareUrl);
+    const encodedUrl = encodeURIComponent(url);
     
     const urls: { [key: string]: string } = {
-      twitter: `https://twitter.com/intent/tweet?text=${encodedText}`,
+      twitter: `https://twitter.com/intent/tweet?text=${encodedText}&url=${encodedUrl}`,
       linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`,
-      whatsapp: `https://wa.me/?text=${encodedText}`,
-      telegram: `https://t.me/share/url?url=${encodedUrl}&text=${encodeURIComponent(`I scored ${score}% on the AI-IQ Test! I'm a certified ${personality.title}. Think you can beat me?`)}`
+      whatsapp: `https://wa.me/?text=${encodedText}%20${encodedUrl}`,
+      telegram: `https://t.me/share/url?url=${encodedUrl}&text=${encodedText}`
     };
     
     if (urls[platform]) {
@@ -104,8 +114,15 @@ export default function ResultPage() {
   };
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(shareUrl);
+    const url = updateShareUrl();
+    navigator.clipboard.writeText(url);
     alert('Challenge link copied! Send it to your friends!');
+  };
+
+  const handleGenerateImage = () => {
+    const url = updateShareUrl();
+    // Open the OG image in a new tab for preview/download
+    window.open(`/api/og?score=${score}${nickname ? `&name=${encodeURIComponent(nickname)}` : ''}`, '_blank');
   };
 
   return (
@@ -148,17 +165,52 @@ export default function ResultPage() {
             </div>
           </div>
 
-          {/* Share Section */}
+          {/* Share Section with Nickname Input */}
           <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 mb-8">
             <h2 className="text-2xl font-bold mb-6 text-center">
               🔥 Challenge Your Friends
             </h2>
             
+            {/* Nickname Input */}
+            {!showNicknameInput ? (
+              <button
+                onClick={() => setShowNicknameInput(true)}
+                className="w-full mb-6 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-3 px-6 rounded-lg transition-all duration-200"
+              >
+                ✨ Personalize Your Share
+              </button>
+            ) : (
+              <div className="mb-6 space-y-4">
+                <input
+                  type="text"
+                  placeholder="Enter your nickname (optional)"
+                  value={nickname}
+                  onChange={(e) => setNickname(e.target.value)}
+                  className="w-full p-4 bg-black/30 rounded-lg text-white placeholder-gray-400"
+                  maxLength={20}
+                />
+                <div className="flex gap-4">
+                  <button
+                    onClick={() => setShowNicknameInput(false)}
+                    className="flex-1 bg-gray-600 hover:bg-gray-700 text-white py-3 px-4 rounded-lg transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleGenerateImage}
+                    className="flex-1 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold py-3 px-4 rounded-lg transition-colors"
+                  >
+                    Preview Image
+                  </button>
+                </div>
+              </div>
+            )}
+            
             {/* Challenge URL */}
             <div className="bg-black/30 rounded-lg p-4 mb-6">
               <p className="text-sm text-gray-400 mb-2">Your unique challenge link:</p>
               <div className="flex items-center justify-between">
-                <p className="text-cyan-400 truncate mr-4">{shareUrl}</p>
+                <p className="text-cyan-400 truncate mr-4 text-sm">{shareUrl}</p>
                 <button
                   onClick={copyToClipboard}
                   className="bg-cyan-500 hover:bg-cyan-600 text-white px-4 py-2 rounded-lg transition-colors"
@@ -194,6 +246,10 @@ export default function ResultPage() {
               >
                 Telegram
               </button>
+            </div>
+            
+            <div className="mt-4 text-center text-sm text-gray-400">
+              💡 Tip: Add your nickname to make the share image more personal!
             </div>
           </div>
 
