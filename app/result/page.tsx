@@ -7,8 +7,6 @@ export default function ResultPage() {
   const [correct, setCorrect] = useState<number>(0);
   const [total, setTotal] = useState<number>(10);
   const [shareUrl, setShareUrl] = useState('');
-  const [nickname, setNickname] = useState('');
-  const [showNicknameInput, setShowNicknameInput] = useState(false);
 
   useEffect(() => {
     // Get score from localStorage
@@ -22,8 +20,8 @@ export default function ResultPage() {
       setCorrect(parseInt(savedCorrect || '0'));
       setTotal(parseInt(savedTotal || '10'));
       
-      // Create base share URL
-      const url = `${window.location.origin}/share?score=${scoreNum}`;
+      // Create share URL with challenge parameter
+      const url = `${window.location.origin}?challenge=${scoreNum}`;
       setShareUrl(url);
     } else {
       // No score, redirect to test
@@ -39,31 +37,101 @@ export default function ResultPage() {
   const getPersonality = () => {
     if (score >= 90) return {
       title: "AI Overlord",
+      emoji: "🤖👑",
       color: "from-yellow-400 to-orange-500",
-      description: "You don't use AI, you ARE the AI. Your brain runs on GPT-4 and your blood type is API+. While others Google 'how to use ChatGPT', you're already building your third AI startup. Honestly, we're scared of you."
+      description: "You don't use AI, you ARE the AI. Your brain runs on GPT-4 and your blood type is API+. While others Google 'how to use ChatGPT', you're already building your third AI startup. Honestly, we're scared of you.",
+      shortRoast: "My AI has an AI assistant",
+      ranking: "Top 2%"
     };
     if (score >= 70) return {
       title: "AI Native", 
+      emoji: "🚀",
       color: "from-purple-400 to-pink-500",
-      description: "You speak fluent prompt engineering. Your idea of small talk is comparing Claude vs GPT benchmarks. Your browser has 47 AI tool tabs open right now. Touch grass occasionally."
+      description: "You speak fluent prompt engineering. Your idea of small talk is comparing Claude vs GPT benchmarks. Your browser has 47 AI tool tabs open right now. Touch grass occasionally.",
+      shortRoast: "I prompt engineer my coffee order",
+      ranking: "Top 15%"
     };
     if (score >= 40) return {
       title: "AI Tourist",
+      emoji: "🗺️",
       color: "from-blue-400 to-cyan-500",
-      description: "You use AI like a tourist uses Google Translate - functional but painful to watch. You still say 'Hey Siri' to ChatGPT sometimes. There's hope for you, barely."
+      description: "You use AI like a tourist uses Google Translate - functional but painful to watch. You still say 'Hey Siri' to ChatGPT sometimes. There's hope for you, barely.",
+      shortRoast: "Still saying 'Hey Siri' to ChatGPT",
+      ranking: "Top 60%"
     };
     return {
       title: "Digital Amish",
+      emoji: "🕯️",
       color: "from-gray-400 to-gray-600",
-      description: "You just discovered copy-paste last week and it blew your mind. Your password is still 'password123'. You print emails to read them better. We respect your commitment to tradition though."
+      description: "You just discovered copy-paste last week and it blew your mind. Your password is still 'password123'. You print emails to read them better. We respect your commitment to tradition though.",
+      shortRoast: "My password is still password123",
+      ranking: "Bottom 40%"
     };
   };
 
   const personality = getPersonality();
 
-  // More specific roasts based on score ranges
-  const getRoast = () => {
+  // Enhanced share text with emojis and formatting
+  const getShareText = () => {
+    return `🎯 AI-IQ Test Result: ${score}%
+
+${personality.emoji} Level: ${personality.title.toUpperCase()}
+💀 Roast: "${personality.shortRoast}"
+📊 Ranking: ${personality.ranking}
+
+Think you can beat ${score}%? Take the test:
+${shareUrl}`;
+  };
+
+  const shareText = getShareText();
+
+  // Platform-specific share functions
+  const handleShare = (platform: string) => {
+    const encodedText = encodeURIComponent(shareText);
+    const encodedUrl = encodeURIComponent(shareUrl);
+    
+    // Short version for Twitter due to character limit
+    const twitterText = `I got ${score}% on AI-IQ Test! ${personality.emoji}
+
+"${personality.shortRoast}"
+
+Beat my score: ${shareUrl}`;
+    
+    const urls: { [key: string]: string } = {
+      twitter: `https://twitter.com/intent/tweet?text=${encodeURIComponent(twitterText)}`,
+      linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}&summary=${encodedText}`,
+      whatsapp: `https://wa.me/?text=${encodedText}`,
+      telegram: `https://t.me/share/url?url=${encodedUrl}&text=${encodedText}`,
+      reddit: `https://reddit.com/submit?url=${encodedUrl}&title=${encodeURIComponent(`I'm a certified ${personality.title} (${score}% on AI-IQ Test)`)}`,
+      facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`
+    };
+    
+    if (urls[platform]) {
+      window.open(urls[platform], '_blank');
+    }
+  };
+
+  const copyToClipboard = () => {
+    // Copy the full share text
+    navigator.clipboard.writeText(shareText);
+    
+    // Visual feedback
+    const button = document.getElementById('copy-btn');
+    if (button) {
+      const originalText = button.textContent;
+      button.textContent = 'Copied! ✓';
+      button.classList.add('bg-green-600');
+      setTimeout(() => {
+        button.textContent = originalText;
+        button.classList.remove('bg-green-600');
+      }, 2000);
+    }
+  };
+
+  // More specific roasts based on exact score
+  const getDetailedRoast = () => {
     if (score === 100) return "Perfect score? Either you're an AI pretending to be human, or you need to go outside more. Probably both.";
+    if (score === 0) return "You got 0%? That's actually impressive. It takes skill to be this wrong.";
     if (score >= 90) return "Your AI assistant has an AI assistant. You dream in Python. Your idea of a vacation is a hackathon.";
     if (score >= 80) return "You're the person who uses AI to write birthday cards. Your mother is disappointed but impressed.";
     if (score >= 70) return "You use AI like millennials use avocado toast - unnecessarily often but with confidence.";
@@ -73,56 +141,7 @@ export default function ResultPage() {
     if (score >= 30) return "You think AI is that movie with Will Smith. Close enough, I guess.";
     if (score >= 20) return "You still ask people to 'do the Google' for you. It's almost endearing.";
     if (score >= 10) return "Your computer still has a 'turbo' button. We found a fossil, everyone!";
-    return "You got less than 10%? This test is multiple choice. A random clicking monkey would score higher. Impressive, honestly.";
-  };
-
-  // Global ranking (fake but believable)
-  const getGlobalRanking = () => {
-    if (score >= 90) return "Top 2% globally";
-    if (score >= 80) return "Top 8% globally";
-    if (score >= 70) return "Top 15% globally";
-    if (score >= 60) return "Top 30% globally";
-    if (score >= 50) return "Top 45% globally";
-    if (score >= 40) return "Top 60% globally";
-    return "Bottom 40% (there's nowhere to go but up!)";
-  };
-
-  // Update share URL with nickname
-  const updateShareUrl = () => {
-    const baseUrl = `${window.location.origin}/share?score=${score}`;
-    const fullUrl = nickname ? `${baseUrl}&name=${encodeURIComponent(nickname)}` : baseUrl;
-    setShareUrl(fullUrl);
-    return fullUrl;
-  };
-
-  const handleShare = (platform: string) => {
-    const url = updateShareUrl();
-    const shareText = `I scored ${score}% on the AI-IQ Test! I'm a certified ${personality.title}. Think you can beat me?`;
-    const encodedText = encodeURIComponent(shareText);
-    const encodedUrl = encodeURIComponent(url);
-    
-    const urls: { [key: string]: string } = {
-      twitter: `https://twitter.com/intent/tweet?text=${encodedText}&url=${encodedUrl}`,
-      linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`,
-      whatsapp: `https://wa.me/?text=${encodedText}%20${encodedUrl}`,
-      telegram: `https://t.me/share/url?url=${encodedUrl}&text=${encodedText}`
-    };
-    
-    if (urls[platform]) {
-      window.open(urls[platform], '_blank');
-    }
-  };
-
-  const copyToClipboard = () => {
-    const url = updateShareUrl();
-    navigator.clipboard.writeText(url);
-    alert('Challenge link copied! Send it to your friends!');
-  };
-
-  const handleGenerateImage = () => {
-    const url = updateShareUrl();
-    // Open the OG image in a new tab for preview/download
-    window.open(`/api/og?score=${score}${nickname ? `&name=${encodeURIComponent(nickname)}` : ''}`, '_blank');
+    return "This score suggests you answered randomly. A cat walking on keyboard would score higher.";
   };
 
   return (
@@ -144,89 +163,67 @@ export default function ResultPage() {
 
           {/* Personality Card */}
           <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 mb-8">
-            <div className={`text-3xl font-bold mb-4 bg-gradient-to-r ${personality.color} bg-clip-text text-transparent`}>
-              {personality.title}
+            <div className="flex items-center gap-3 mb-4">
+              <span className="text-4xl">{personality.emoji}</span>
+              <div className={`text-3xl font-bold bg-gradient-to-r ${personality.color} bg-clip-text text-transparent`}>
+                {personality.title}
+              </div>
             </div>
+            
             <p className="text-lg text-gray-100 mb-6 leading-relaxed">
               {personality.description}
             </p>
             
-            {/* Roast Section */}
+            {/* Detailed Roast */}
             <div className="border-t border-white/20 pt-6">
               <p className="text-yellow-400 text-lg italic">
-                "{getRoast()}"
+                "{getDetailedRoast()}"
               </p>
             </div>
 
-            {/* Global Ranking */}
-            <div className="mt-6 p-4 bg-white/5 rounded-lg">
-              <p className="text-sm text-gray-400">Global Ranking</p>
-              <p className="text-2xl font-bold text-cyan-400">{getGlobalRanking()}</p>
+            {/* Stats */}
+            <div className="grid grid-cols-2 gap-4 mt-6">
+              <div className="bg-white/5 rounded-lg p-4">
+                <p className="text-sm text-gray-400">Global Ranking</p>
+                <p className="text-2xl font-bold text-cyan-400">{personality.ranking}</p>
+              </div>
+              <div className="bg-white/5 rounded-lg p-4">
+                <p className="text-sm text-gray-400">Your Level</p>
+                <p className="text-2xl font-bold text-purple-400">{personality.title}</p>
+              </div>
             </div>
           </div>
 
-          {/* Share Section with Nickname Input */}
+          {/* Share Section */}
           <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 mb-8">
             <h2 className="text-2xl font-bold mb-6 text-center">
               🔥 Challenge Your Friends
             </h2>
             
-            {/* Nickname Input */}
-            {!showNicknameInput ? (
-              <button
-                onClick={() => setShowNicknameInput(true)}
-                className="w-full mb-6 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-3 px-6 rounded-lg transition-all duration-200"
-              >
-                ✨ Personalize Your Share
-              </button>
-            ) : (
-              <div className="mb-6 space-y-4">
-                <input
-                  type="text"
-                  placeholder="Enter your nickname (optional)"
-                  value={nickname}
-                  onChange={(e) => setNickname(e.target.value)}
-                  className="w-full p-4 bg-black/30 rounded-lg text-white placeholder-gray-400"
-                  maxLength={20}
-                />
-                <div className="flex gap-4">
-                  <button
-                    onClick={() => setShowNicknameInput(false)}
-                    className="flex-1 bg-gray-600 hover:bg-gray-700 text-white py-3 px-4 rounded-lg transition-colors"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={handleGenerateImage}
-                    className="flex-1 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold py-3 px-4 rounded-lg transition-colors"
-                  >
-                    Preview Image
-                  </button>
-                </div>
-              </div>
-            )}
-            
-            {/* Challenge URL */}
+            {/* Share Preview */}
             <div className="bg-black/30 rounded-lg p-4 mb-6">
-              <p className="text-sm text-gray-400 mb-2">Your unique challenge link:</p>
-              <div className="flex items-center justify-between">
-                <p className="text-cyan-400 truncate mr-4 text-sm">{shareUrl}</p>
-                <button
-                  onClick={copyToClipboard}
-                  className="bg-cyan-500 hover:bg-cyan-600 text-white px-4 py-2 rounded-lg transition-colors"
-                >
-                  Copy
-                </button>
-              </div>
+              <p className="text-sm text-gray-400 mb-2">Your share message:</p>
+              <pre className="text-cyan-300 text-sm whitespace-pre-wrap font-mono">
+                {shareText}
+              </pre>
             </div>
 
-            {/* Share Buttons */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {/* Copy Button */}
+            <button
+              id="copy-btn"
+              onClick={copyToClipboard}
+              className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-4 px-8 rounded-lg transition-all duration-200 mb-6"
+            >
+              📋 Copy Share Text
+            </button>
+
+            {/* Share Buttons Grid */}
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               <button
                 onClick={() => handleShare('twitter')}
-                className="bg-black hover:bg-gray-900 text-white py-3 px-4 rounded-lg transition-colors"
+                className="bg-black hover:bg-gray-900 text-white py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
               >
-                𝕏 / Twitter
+                <span>𝕏</span> Twitter
               </button>
               <button
                 onClick={() => handleShare('linkedin')}
@@ -246,10 +243,24 @@ export default function ResultPage() {
               >
                 Telegram
               </button>
+              <button
+                onClick={() => handleShare('reddit')}
+                className="bg-orange-600 hover:bg-orange-700 text-white py-3 px-4 rounded-lg transition-colors"
+              >
+                Reddit
+              </button>
+              <button
+                onClick={() => handleShare('facebook')}
+                className="bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg transition-colors"
+              >
+                Facebook
+              </button>
             </div>
-            
-            <div className="mt-4 text-center text-sm text-gray-400">
-              💡 Tip: Add your nickname to make the share image more personal!
+
+            {/* Challenge Link */}
+            <div className="mt-6 p-4 bg-white/5 rounded-lg">
+              <p className="text-sm text-gray-400 mb-2">Direct challenge link:</p>
+              <p className="text-cyan-400 text-sm break-all">{shareUrl}</p>
             </div>
           </div>
 
@@ -275,7 +286,10 @@ export default function ResultPage() {
           {/* Bottom Tagline */}
           <div className="text-center mt-12 text-gray-400">
             <p className="text-sm">
-              Think this result is wrong? That's exactly what someone with your score would say. 😏
+              Think this result is wrong? That's exactly what someone with your score would say.
+            </p>
+            <p className="text-xs mt-2">
+              Made with 💀 by humans who probably scored lower than you
             </p>
           </div>
         </div>
