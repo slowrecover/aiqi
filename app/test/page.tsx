@@ -5,113 +5,113 @@ import { useState } from 'react';
 const questions = [
   {
     id: 1,
-    question: "You need to write a professional email. What's the best way to use AI?",
+    question: "When your boss asks for a 'quick report' at 4:45 PM:",
     options: [
-      "Just type 'write an email'",
-      "Provide context, tone, key points, and desired outcome",
-      "AI can't write professional emails",
-      "Copy an example from Google"
+      "Open Word and start typing furiously",
+      "Google 'quarterly report template 2024'",
+      "ChatGPT writes it while you grab snacks",
+      "Your AI agent already emailed it 2 hours ago 'just in case'"
     ],
-    correct: 1
+    correct: 3
   },
   {
     id: 2,
-    question: "Which AI tool is best for analyzing large spreadsheets?",
+    question: "Your Monday morning email inbox has 147 unread messages:",
     options: [
-      "ChatGPT with Code Interpreter",
-      "Midjourney",
-      "Stable Diffusion",
-      "DALL-E"
+      "Coffee first, then suffering through each one",
+      "AI summarizes everything into 5 bullet points",
+      "Mark all as read and hope for the best",
+      "Your AI assistant already replied to 80% and scheduled meetings from the rest"
+    ],
+    correct: 3
+  },
+  {
+    id: 3,
+    question: "Planning a presentation for tomorrow's board meeting:",
+    options: [
+      "Your AI saw the meeting invite and already created 3 versions for you to choose",
+      "PowerPoint template from 2015 (it's vintage now)",
+      "Canva templates (you're not a designer but you try)",
+      "Describe your idea to AI, get back complete deck with speaker notes"
     ],
     correct: 0
   },
   {
-    id: 3,
-    question: "When asking AI for help with code, you should:",
-    options: [
-      "Paste all code and say 'fix this'",
-      "Explain the problem, show relevant code, describe what you tried",
-      "Let AI write everything from scratch",
-      "Never use AI for coding"
-    ],
-    correct: 1
-  },
-  {
     id: 4,
-    question: "What's the main limitation of current AI models?",
+    question: "You need to analyze 500 pages of market research:",
     options: [
-      "They can't be creative",
-      "They lack real-time data and personal experience",
-      "They only work in English",
-      "They can't understand context"
+      "Hire an intern (classic move)",
+      "AI digests it into key insights with supporting data",
+      "Read the executive summary and pretend you read it all",
+      "Your AI already integrated it into your strategy doc with recommendations"
     ],
-    correct: 1
+    correct: 3
   },
   {
     id: 5,
-    question: "To get better AI responses, you should:",
+    question: "Learning a new skill for career growth:",
     options: [
-      "Use all caps for emphasis",
-      "Keep prompts very short",
-      "Break complex tasks into steps",
-      "Repeat the question multiple times"
+      "Buy a course on Udemy (that you'll never finish)",
+      "YouTube University at 2x speed",
+      "AI creates personalized curriculum and practices with you daily",
+      "Hope your colleague will teach you"
     ],
     correct: 2
   },
   {
     id: 6,
-    question: "Which task is AI currently WORST at?",
+    question: "Your Zoom camera 'stops working' during a boring meeting:",
     options: [
-      "Writing essays",
-      "Translating languages",
-      "Understanding personal emotions and context",
-      "Solving math problems"
+      "It actually broke (what are the odds)",
+      "You're in pajamas and forgot",
+      "Strategic 'technical difficulties'",
+      "Your AI avatar is attending while you do actual work"
     ],
-    correct: 2
+    correct: 3
   },
   {
     id: 7,
-    question: "When should you NOT use AI?",
+    question: "Preparing for a job interview tomorrow:",
     options: [
-      "For creative writing",
-      "For legal or medical advice without verification",
-      "For learning new concepts",
-      "For drafting emails"
+      "Practice answers in the mirror like it's 2010",
+      "Your AI analyzes the company, role, and interviewer's background to prep you",
+      "Read the company's About page 5 minutes before",
+      "Wing it with confidence"
     ],
     correct: 1
   },
   {
     id: 8,
-    question: "The best way to fact-check AI responses is to:",
+    question: "Client asks for 'innovative solutions' to their problem:",
     options: [
-      "Ask the same AI again",
-      "Trust it completely",
-      "Verify with reliable sources",
-      "Assume it's always wrong"
+      "Google what competitors are doing",
+      "Brainstorm with your team for 3 hours",
+      "AI generates 20 solutions ranked by feasibility and impact",
+      "Repackage last year's proposal with new fonts"
     ],
     correct: 2
   },
   {
     id: 9,
-    question: "AI 'hallucinations' refer to:",
+    question: "Your code isn't working and Stack Overflow is down:",
     options: [
-      "Visual glitches in AI art",
-      "When AI makes up false information",
-      "AI becoming conscious",
-      "Errors in voice recognition"
+      "AI debugs it and explains what you did wrong (again)",
+      "Cry",
+      "Try random semicolons until something works",
+      "Blame the previous developer (it's tradition)"
     ],
-    correct: 1
+    correct: 0
   },
   {
     id: 10,
-    question: "For best results, AI prompts should be:",
+    question: "Planning your career for the next 5 years:",
     options: [
-      "As short as possible",
-      "Vague and open-ended",
-      "Clear, specific, and contextual",
-      "Written in code"
+      "Vision board with magazine cutouts",
+      "Whatever happens, happens",
+      "Excel spreadsheet with color-coded goals",
+      "AI simulates different career paths based on market trends and your skills"
     ],
-    correct: 2
+    correct: 3
   }
 ];
 
@@ -230,7 +230,7 @@ export default function TestPage() {
         {/* Tips */}
         <div className="max-w-2xl mx-auto mt-8 text-center">
           <p className="text-gray-400 text-sm">
-            💡 Choose the answer that best reflects effective AI usage
+            💡 Choose the answer that best reflects your actual workflow
           </p>
         </div>
       </div>
