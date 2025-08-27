@@ -1,49 +1,47 @@
-// app/api/og/route.tsx
-import { ImageResponse } from '@vercel/og';
+// app/layout.tsx
+import type { Metadata } from 'next'
+import { Geist, Geist_Mono } from 'next/font/google'
+import './globals.css'
 
-export const runtime = 'edge';
+const geist = Geist({
+  subsets: ['latin'],
+  variable: '--font-geist-sans',
+})
 
-export async function GET(request: Request) {
-  try {
-    const { searchParams } = new URL(request.url);
-    const score = searchParams.get('score') || '50';
-    
-    return new ImageResponse(
-      (
-        <div
-          style={{
-            fontSize: 60,
-            background: 'linear-gradient(to bottom, purple, blue)',
-            width: '100%',
-            height: '100%',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: 'white',
+const geistMono = Geist_Mono({
+  subsets: ['latin'],
+  variable: '--font-geist-mono',
+})
+
+export const metadata: Metadata = {
+  title: 'AI-IQ Test - How AI Native Are You?',
+  description: 'Discover your AI usage level with this brutally honest test',
+}
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  return (
+    <html lang="en">
+      <head>
+        {/* Google Analytics */}
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-M3V4ENN4BV"></script>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-M3V4ENN4BV');
+            `,
           }}
-        >
-          <div>AI-IQ TEST</div>
-          <div style={{ fontSize: 120, fontWeight: 'bold', marginTop: 20 }}>
-            {score}%
-          </div>
-          <div style={{ fontSize: 30, marginTop: 20 }}>
-            Think you can beat it?
-          </div>
-          <div style={{ fontSize: 24, marginTop: 30, opacity: 0.8 }}>
-            ai-iq.vercel.app
-          </div>
-        </div>
-      ),
-      {
-        width: 1200,
-        height: 630,
-      },
-    );
-  } catch (e: any) {
-    console.error('OG Image generation error:', e);
-    return new Response(`Failed to generate image`, {
-      status: 500,
-    });
-  }
+        />
+      </head>
+      <body className={`${geist.variable} ${geistMono.variable} font-sans`}>
+        {children}
+      </body>
+    </html>
+  )
 }
