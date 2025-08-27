@@ -1,21 +1,20 @@
-// app/layout.tsx
 import type { Metadata } from 'next'
-import { Geist, Geist_Mono } from 'next/font/google'
+import { Inter } from 'next/font/google'
 import './globals.css'
 
-const geist = Geist({
-  subsets: ['latin'],
-  variable: '--font-geist-sans',
-})
-
-const geistMono = Geist_Mono({
-  subsets: ['latin'],
-  variable: '--font-geist-mono',
-})
+const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: 'AI-IQ Test - How AI Native Are You?',
   description: 'Discover your AI usage level with this brutally honest test',
+  keywords: 'AI test, ChatGPT quiz, AI native, AI usage level',
+  openGraph: {
+    title: 'AI-IQ Test - How AI Native Are You?',
+    description: 'Take this brutally honest quiz to find out your AI usage level',
+    url: 'https://ai-iq.vercel.app',
+    siteName: 'AI-IQ Test',
+    type: 'website',
+  },
 }
 
 export default function RootLayout({
@@ -34,12 +33,12 @@ export default function RootLayout({
               window.dataLayer = window.dataLayer || [];
               function gtag(){dataLayer.push(arguments);}
               gtag('js', new Date());
-              gtag('config', G-1LCG9G1L7N);
+              gtag('config', 'G-1LCG9G1L7N');
             `,
           }}
         />
       </head>
-      <body className={`${geist.variable} ${geistMono.variable} font-sans`}>
+      <body className={inter.className}>
         {children}
       </body>
     </html>
