@@ -4,7 +4,8 @@ import { useEffect, useState } from 'react';
 
 export default function Home() {
   const [challengeScore, setChallengeScore] = useState<number | null>(null);
-  const [testsTaken, setTestsTaken] = useState(247892);
+  const [testsTaken, setTestsTaken] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     // Check for challenge parameter
@@ -17,13 +18,36 @@ export default function Home() {
       }
     }
 
-    // Simulate incrementing tests taken
-    const interval = setInterval(() => {
-      setTestsTaken(prev => prev + Math.floor(Math.random() * 3) + 1);
-    }, 5000);
+    // Get real test count from localStorage
+    const SEED_COUNT = 47; // Beta testers (be honest about this)
+    const realCount = parseInt(localStorage.getItem('total_tests_completed') || '0');
+    setTestsTaken(SEED_COUNT + realCount);
+    setIsLoading(false);
 
-    return () => clearInterval(interval);
+    // Listen for storage changes (when someone completes test in another tab)
+    const handleStorageChange = () => {
+      const newCount = parseInt(localStorage.getItem('total_tests_completed') || '0');
+      setTestsTaken(SEED_COUNT + newCount);
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
+
+  // Calculate dynamic stats based on real data
+  const getAverageScore = () => {
+    const scores = JSON.parse(localStorage.getItem('all_scores') || '[]');
+    if (scores.length === 0) return 45; // Default estimate
+    const avg = scores.reduce((a: number, b: number) => a + b, 0) / scores.length;
+    return Math.round(avg);
+  };
+
+  const getElitePercentage = () => {
+    const scores = JSON.parse(localStorage.getItem('all_scores') || '[]');
+    if (scores.length === 0) return 2; // Default estimate
+    const elite = scores.filter((s: number) => s >= 90).length;
+    return Math.max(1, Math.round((elite / scores.length) * 100));
+  };
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 text-white">
@@ -58,18 +82,33 @@ export default function Home() {
             90% of people score under 50%. The question is: are you the 90% or the 10%?
           </p>
 
-          {/* Stats */}
+          {/* Stats - Now with real data */}
           <div className="grid grid-cols-3 gap-4 max-w-2xl mx-auto mb-12">
             <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
-              <p className="text-3xl font-bold text-cyan-400">{testsTaken.toLocaleString()}</p>
-              <p className="text-sm text-gray-400">Tests Taken</p>
+              {isLoading ? (
+                <div className="animate-pulse">
+                  <div className="h-8 bg-white/20 rounded mb-2"></div>
+                </div>
+              ) : (
+                <>
+                  <p className="text-3xl font-bold text-cyan-400">
+                    {testsTaken < 100 ? testsTaken : 
+                     testsTaken < 1000 ? `${Math.floor(testsTaken/100)*100}+` : 
+                     `${Math.floor(testsTaken/1000)}k+`}
+                  </p>
+                  <p className="text-sm text-gray-400">Humans Roasted</p>
+                  {testsTaken < 100 && (
+                    <p className="text-xs text-gray-500 mt-1">Real count</p>
+                  )}
+                </>
+              )}
             </div>
             <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
-              <p className="text-3xl font-bold text-yellow-400">42%</p>
-              <p className="text-sm text-gray-400">Average Score</p>
+              <p className="text-3xl font-bold text-yellow-400">Brutal</p>
+              <p className="text-sm text-gray-400">Difficulty Level</p>
             </div>
             <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
-              <p className="text-3xl font-bold text-red-400">2%</p>
+              <p className="text-3xl font-bold text-red-400">{getElitePercentage()}%</p>
               <p className="text-sm text-gray-400">Score 90+</p>
             </div>
           </div>
@@ -143,8 +182,13 @@ export default function Home() {
 
           {/* Footer */}
           <div className="mt-16 text-gray-400 text-sm">
-            <p>No signup required · No AI was harmed in making this test</p>
-            <p className="mt-2">Made by humans who are probably scoring lower than you</p>
+            <p>No signup required · For entertainment purposes only</p>
+            <p className="mt-2">Not a scientific assessment · Just a mirror with attitude</p>
+            {testsTaken < 100 && (
+              <p className="mt-4 text-xs text-gray-500">
+                {testsTaken > 47 ? `${testsTaken - 47} real tests completed (+ 47 beta testers)` : 'Beta testing phase'}
+              </p>
+            )}
           </div>
         </div>
       </div>

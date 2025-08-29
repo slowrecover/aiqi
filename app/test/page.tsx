@@ -1,6 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+
+// 添加 gtag 类型声明
+declare global {
+  interface Window {
+    gtag?: (command: string, ...args: any[]) => void;
+  }
+}
 
 const questions = [
   {
@@ -120,6 +127,16 @@ export default function TestPage() {
   const [answers, setAnswers] = useState<number[]>([]);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
 
+  // Track test start
+  useEffect(() => {
+    if (typeof window.gtag !== 'undefined') {
+      window.gtag('event', 'test_started', {
+        event_category: 'engagement',
+        event_label: 'test_page_loaded'
+      });
+    }
+  }, []);
+
   const handleSelectOption = (optionIndex: number) => {
     setSelectedOption(optionIndex);
   };
@@ -149,9 +166,30 @@ export default function TestPage() {
       localStorage.setItem('aiiq_correct', correct.toString());
       localStorage.setItem('aiiq_total', questions.length.toString());
       
+      // Track test completion
+      if (typeof window.gtag !== 'undefined') {
+        window.gtag('event', 'test_completed', {
+          event_category: 'engagement',
+          event_label: 'test_finished',
+          value: score
+        });
+      }
+      
       // Go to results
       window.location.href = '/result';
     }
+  };
+
+  const handleExit = () => {
+    // Track test abandonment
+    if (typeof window.gtag !== 'undefined') {
+      window.gtag('event', 'test_abandoned', {
+        event_category: 'engagement',
+        event_label: `question_${currentQuestion + 1}`,
+        value: currentQuestion + 1
+      });
+    }
+    window.location.href = '/';
   };
 
   const progress = ((currentQuestion + 1) / questions.length) * 100;
@@ -211,7 +249,7 @@ export default function TestPage() {
             {/* Navigation */}
             <div className="mt-8 flex justify-between">
               <button
-                onClick={() => window.location.href = '/'}
+                onClick={handleExit}
                 className="px-6 py-3 text-gray-400 hover:text-white transition-colors"
               >
                 Exit Test
@@ -231,6 +269,9 @@ export default function TestPage() {
         <div className="max-w-2xl mx-auto mt-8 text-center">
           <p className="text-gray-400 text-sm">
             💡 Choose the answer that best reflects your actual workflow
+          </p>
+          <p className="text-gray-500 text-xs mt-2">
+            Not a scientific assessment · For entertainment purposes only
           </p>
         </div>
       </div>

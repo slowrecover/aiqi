@@ -2,6 +2,13 @@
 
 import { useEffect, useState } from 'react';
 
+// 添加 gtag 类型声明
+declare global {
+  interface Window {
+    gtag?: (command: string, ...args: any[]) => void;
+  }
+}
+
 export default function ResultPage() {
   const [score, setScore] = useState<number | null>(null);
   const [correct, setCorrect] = useState<number>(0);
@@ -23,11 +30,53 @@ export default function ResultPage() {
       // Create share URL with challenge parameter
       const url = `${window.location.origin}?challenge=${scoreNum}`;
       setShareUrl(url);
+
+      // Update real statistics
+      updateStatistics(scoreNum);
+      
+      // Track with Google Analytics
+      if (typeof window.gtag !== 'undefined') {
+        window.gtag('event', 'test_completed', {
+          event_category: 'engagement',
+          event_label: getPersonalityTitle(scoreNum),
+          value: scoreNum
+        });
+      }
     } else {
       // No score, redirect to test
       window.location.href = '/test';
     }
   }, []);
+
+  // Helper function to get personality title
+  const getPersonalityTitle = (score: number) => {
+    if (score >= 90) return "AI Overlord";
+    if (score >= 70) return "AI Native";
+    if (score >= 40) return "AI Tourist";
+    return "Digital Amish";
+  };
+
+  // Update statistics in localStorage
+  const updateStatistics = (newScore: number) => {
+    // Update total completed count
+    const currentTotal = parseInt(localStorage.getItem('total_tests_completed') || '0');
+    localStorage.setItem('total_tests_completed', (currentTotal + 1).toString());
+
+    // Update scores array for average calculation
+    const scores = JSON.parse(localStorage.getItem('all_scores') || '[]');
+    scores.push(newScore);
+    // Keep only last 100 scores to avoid localStorage limits
+    if (scores.length > 100) {
+      scores.shift();
+    }
+    localStorage.setItem('all_scores', JSON.stringify(scores));
+
+    // Update level distribution
+    const levelCounts = JSON.parse(localStorage.getItem('level_distribution') || '{}');
+    const level = getPersonalityTitle(newScore);
+    levelCounts[level] = (levelCounts[level] || 0) + 1;
+    localStorage.setItem('level_distribution', JSON.stringify(levelCounts));
+  };
 
   if (score === null) {
     return <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900" />;
@@ -87,6 +136,15 @@ ${shareUrl}`;
 
   // Platform-specific share functions
   const handleShare = (platform: string) => {
+    // Track share event
+    if (typeof window.gtag !== 'undefined') {
+      window.gtag('event', 'share', {
+        event_category: 'engagement',
+        event_label: platform,
+        value: score
+      });
+    }
+
     const encodedText = encodeURIComponent(shareText);
     const encodedUrl = encodeURIComponent(shareUrl);
     
@@ -114,6 +172,14 @@ Beat my score: ${shareUrl}`;
   const copyToClipboard = () => {
     // Copy the full share text
     navigator.clipboard.writeText(shareText);
+    
+    // Track copy event
+    if (typeof window.gtag !== 'undefined') {
+      window.gtag('event', 'copy_share_text', {
+        event_category: 'engagement',
+        value: score
+      });
+    }
     
     // Visual feedback
     const button = document.getElementById('copy-btn');
@@ -268,7 +334,10 @@ Beat my score: ${shareUrl}`;
           <div className="flex flex-col sm:flex-row gap-4">
             <button
               onClick={() => {
-                localStorage.clear();
+                // Clear only test data, not statistics
+                localStorage.removeItem('aiiq_score');
+                localStorage.removeItem('aiiq_correct');
+                localStorage.removeItem('aiiq_total');
                 window.location.href = '/test';
               }}
               className="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold py-4 px-8 rounded-lg transition-all duration-200"
@@ -289,7 +358,7 @@ Beat my score: ${shareUrl}`;
               Think this result is wrong? That's exactly what someone with your score would say.
             </p>
             <p className="text-xs mt-2">
-              Made with 💀 by humans who probably scored lower than you
+              For entertainment purposes only · Not a scientific assessment
             </p>
           </div>
         </div>
