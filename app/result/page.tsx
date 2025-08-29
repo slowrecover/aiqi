@@ -31,7 +31,7 @@ export default function ResultPage() {
       const url = `${window.location.origin}?challenge=${scoreNum}`;
       setShareUrl(url);
 
-      // Update real statistics
+      // Update statistics
       updateStatistics(scoreNum);
       
       // Track with Google Analytics
@@ -58,24 +58,42 @@ export default function ResultPage() {
 
   // Update statistics in localStorage
   const updateStatistics = (newScore: number) => {
-    // Update total completed count
-    const currentTotal = parseInt(localStorage.getItem('total_tests_completed') || '0');
-    localStorage.setItem('total_tests_completed', (currentTotal + 1).toString());
-
-    // Update scores array for average calculation
-    const scores = JSON.parse(localStorage.getItem('all_scores') || '[]');
-    scores.push(newScore);
-    // Keep only last 100 scores to avoid localStorage limits
-    if (scores.length > 100) {
-      scores.shift();
+    try {
+      // Log for debugging
+      console.log('Updating statistics with score:', newScore);
+      
+      // Update total tests count
+      const currentTotal = parseInt(localStorage.getItem('aiiq_total_tests') || '0');
+      const newTotal = currentTotal + 1;
+      localStorage.setItem('aiiq_total_tests', newTotal.toString());
+      console.log('Total tests updated:', newTotal);
+      
+      // Update scores array
+      const scoresStr = localStorage.getItem('aiiq_all_scores');
+      const scores = scoresStr ? JSON.parse(scoresStr) : [];
+      scores.push(newScore);
+      
+      // Keep only last 100 scores
+      if (scores.length > 100) {
+        scores.shift();
+      }
+      localStorage.setItem('aiiq_all_scores', JSON.stringify(scores));
+      console.log('Scores array updated, length:', scores.length);
+      
+      // Update level distribution
+      const levelsStr = localStorage.getItem('aiiq_level_dist');
+      const levels = levelsStr ? JSON.parse(levelsStr) : {};
+      const level = getPersonalityTitle(newScore);
+      levels[level] = (levels[level] || 0) + 1;
+      localStorage.setItem('aiiq_level_dist', JSON.stringify(levels));
+      console.log('Level distribution updated:', levels);
+      
+      // Force a storage event for other tabs
+      window.dispatchEvent(new Event('storage'));
+      
+    } catch (error) {
+      console.error('Error updating statistics:', error);
     }
-    localStorage.setItem('all_scores', JSON.stringify(scores));
-
-    // Update level distribution
-    const levelCounts = JSON.parse(localStorage.getItem('level_distribution') || '{}');
-    const level = getPersonalityTitle(newScore);
-    levelCounts[level] = (levelCounts[level] || 0) + 1;
-    localStorage.setItem('level_distribution', JSON.stringify(levelCounts));
   };
 
   if (score === null) {
@@ -170,7 +188,6 @@ Beat my score: ${shareUrl}`;
   };
 
   const copyToClipboard = () => {
-    // Copy the full share text
     navigator.clipboard.writeText(shareText);
     
     // Track copy event
