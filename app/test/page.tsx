@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 
-// 添加 gtag 类型声明
 declare global {
   interface Window {
     gtag?: (command: string, ...args: any[]) => void;
@@ -12,113 +11,113 @@ declare global {
 const questions = [
   {
     id: 1,
-    question: "When your boss asks for a 'quick report' at 4:45 PM:",
+    question: "Your boss wants a 'quick report' by 5 PM:",
     options: [
-      "Open Word and start typing furiously",
-      "Google 'quarterly report template 2024'",
-      "ChatGPT writes it while you grab snacks",
-      "Your AI agent already emailed it 2 hours ago 'just in case'"
+      "Actually write it like it's 1995",
+      "Copy last year's and pray nobody notices",
+      "ChatGPT writes it while you pretend to look busy",
+      "Your AI already sent it this morning, you're just sitting there"
     ],
     correct: 3
   },
   {
     id: 2,
-    question: "Your Monday morning email inbox has 147 unread messages:",
+    question: "147 unread emails on Monday morning:",
     options: [
-      "Coffee first, then suffering through each one",
-      "AI summarizes everything into 5 bullet points",
-      "Mark all as read and hope for the best",
-      "Your AI assistant already replied to 80% and scheduled meetings from the rest"
+      "Read them all like a psychopath",
+      "Mass delete and blame the spam filter",
+      "AI summarizes them in 30 seconds while you drink coffee",
+      "Your AI already replied to the important ones at 3 AM"
     ],
     correct: 3
   },
   {
     id: 3,
-    question: "Planning a presentation for tomorrow's board meeting:",
+    question: "Tomorrow's presentation isn't ready:",
     options: [
-      "Your AI saw the meeting invite and already created 3 versions for you to choose",
-      "PowerPoint template from 2015 (it's vintage now)",
-      "Canva templates (you're not a designer but you try)",
-      "Describe your idea to AI, get back complete deck with speaker notes"
+      "Pull an all-nighter with PowerPoint",
+      "Recycling old slides and hoping nobody remembers",
+      "Ask ChatGPT nicely to make one",
+      "Your AI predicted this meeting and already has 3 versions ready"
     ],
-    correct: 0
+    correct: 3
   },
   {
     id: 4,
-    question: "You need to analyze 500 pages of market research:",
+    question: "500 pages of 'urgent' market research to analyze:",
     options: [
-      "Hire an intern (classic move)",
-      "AI digests it into key insights with supporting data",
-      "Read the executive summary and pretend you read it all",
-      "Your AI already integrated it into your strategy doc with recommendations"
+      "Actually read it (and die inside)",
+      "Ctrl+F for keywords and fake the rest",
+      "Feed it to AI and get a summary",
+      "Your AI already integrated it into your strategy while you slept"
     ],
     correct: 3
   },
   {
     id: 5,
-    question: "Learning a new skill for career growth:",
+    question: "Need to learn Python for a new project:",
     options: [
-      "Buy a course on Udemy (that you'll never finish)",
-      "YouTube University at 2x speed",
-      "AI creates personalized curriculum and practices with you daily",
-      "Hope your colleague will teach you"
+      "Buy a $200 course you'll never finish",
+      "YouTube tutorials at 2x speed",
+      "Let AI teach you exactly what you need",
+      "Why learn? AI writes better code than you anyway"
     ],
     correct: 2
   },
   {
     id: 6,
-    question: "Your Zoom camera 'stops working' during a boring meeting:",
+    question: "Your code doesn't work and it's 2 AM:",
     options: [
-      "It actually broke (what are the odds)",
-      "You're in pajamas and forgot",
-      "Strategic 'technical difficulties'",
-      "Your AI avatar is attending while you do actual work"
-    ],
-    correct: 3
-  },
-  {
-    id: 7,
-    question: "Preparing for a job interview tomorrow:",
-    options: [
-      "Practice answers in the mirror like it's 2010",
-      "Your AI analyzes the company, role, and interviewer's background to prep you",
-      "Read the company's About page 5 minutes before",
-      "Wing it with confidence"
-    ],
-    correct: 1
-  },
-  {
-    id: 8,
-    question: "Client asks for 'innovative solutions' to their problem:",
-    options: [
-      "Google what competitors are doing",
-      "Brainstorm with your team for 3 hours",
-      "AI generates 20 solutions ranked by feasibility and impact",
-      "Repackage last year's proposal with new fonts"
-    ],
-    correct: 2
-  },
-  {
-    id: 9,
-    question: "Your code isn't working and Stack Overflow is down:",
-    options: [
-      "AI debugs it and explains what you did wrong (again)",
-      "Cry",
-      "Try random semicolons until something works",
-      "Blame the previous developer (it's tradition)"
+      "AI fixes it and explains why you're an idiot",
+      "Random semicolons until something happens",
+      "Stack Overflow is down, time to panic",
+      "Blame the compiler and go to bed"
     ],
     correct: 0
   },
   {
-    id: 10,
-    question: "Planning your career for the next 5 years:",
+    id: 7,
+    question: "Client asks for 'innovative solutions':",
     options: [
-      "Vision board with magazine cutouts",
-      "Whatever happens, happens",
-      "Excel spreadsheet with color-coded goals",
-      "AI simulates different career paths based on market trends and your skills"
+      "Google what competitors did in 2019",
+      "Brainstorm = everyone pretends to think",
+      "AI generates 20 ideas ranked by feasibility",
+      "Say 'blockchain' and 'synergy' until they leave"
+    ],
+    correct: 2
+  },
+  {
+    id: 8,
+    question: "Writing your LinkedIn 'thought leadership' post:",
+    options: [
+      "Authentic thoughts (lol who does this)",
+      "Copy Gary Vee but make it worse",
+      "ChatGPT writes it, you add emoji",
+      "AI writes, posts, and replies to comments while you sleep"
     ],
     correct: 3
+  },
+  {
+    id: 9,
+    question: "Annual performance review time:",
+    options: [
+      "List actual achievements like a sucker",
+      "Exaggerate everything by 200%",
+      "AI quantifies your impact with fake metrics",
+      "AI wrote it in January, you've been coasting since"
+    ],
+    correct: 3
+  },
+  {
+    id: 10,
+    question: "Someone asks 'What does AI think about this?':",
+    options: [
+      "Explain that AI doesn't 'think'",
+      "Make up something that sounds smart",
+      "Ask AI what it thinks about itself",
+      "You've merged with AI, there is no difference anymore"
+    ],
+    correct: 0
   }
 ];
 
@@ -127,7 +126,6 @@ export default function TestPage() {
   const [answers, setAnswers] = useState<number[]>([]);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
 
-  // Track test start
   useEffect(() => {
     if (typeof window.gtag !== 'undefined') {
       window.gtag('event', 'test_started', {
@@ -151,7 +149,6 @@ export default function TestPage() {
       setCurrentQuestion(currentQuestion + 1);
       setSelectedOption(null);
     } else {
-      // Calculate score
       let correct = 0;
       newAnswers.forEach((answer, index) => {
         if (answer === questions[index].correct) {
@@ -161,12 +158,10 @@ export default function TestPage() {
       
       const score = Math.round((correct / questions.length) * 100);
       
-      // Store in localStorage
       localStorage.setItem('aiiq_score', score.toString());
       localStorage.setItem('aiiq_correct', correct.toString());
       localStorage.setItem('aiiq_total', questions.length.toString());
       
-      // Track test completion
       if (typeof window.gtag !== 'undefined') {
         window.gtag('event', 'test_completed', {
           event_category: 'engagement',
@@ -175,13 +170,11 @@ export default function TestPage() {
         });
       }
       
-      // Go to results
       window.location.href = '/result';
     }
   };
 
   const handleExit = () => {
-    // Track test abandonment
     if (typeof window.gtag !== 'undefined') {
       window.gtag('event', 'test_abandoned', {
         event_category: 'engagement',
@@ -195,36 +188,32 @@ export default function TestPage() {
   const progress = ((currentQuestion + 1) / questions.length) * 100;
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 text-white">
+    <main className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
       <div className="container mx-auto px-4 py-8">
-        {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold mb-2">
-            AI<span className="text-blue-400">-IQ</span> Test
+          <h1 className="text-4xl font-bold mb-2 text-slate-100">
+            AI<span className="text-cyan-400">-IQ</span> Test
           </h1>
-          <p className="text-gray-300">
+          <p className="text-slate-400">
             Question {currentQuestion + 1} of {questions.length}
           </p>
         </div>
 
-        {/* Progress Bar */}
         <div className="max-w-2xl mx-auto mb-8">
-          <div className="bg-white/20 rounded-full h-3 overflow-hidden">
+          <div className="bg-slate-700/30 rounded-full h-3 overflow-hidden">
             <div 
-              className="bg-gradient-to-r from-blue-500 to-purple-500 h-full transition-all duration-300"
+              className="bg-gradient-to-r from-cyan-500 to-blue-500 h-full transition-all duration-300"
               style={{ width: `${progress}%` }}
             />
           </div>
         </div>
 
-        {/* Question Card */}
         <div className="max-w-2xl mx-auto">
-          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8">
-            <h2 className="text-2xl font-bold mb-6">
+          <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-8 border border-slate-700">
+            <h2 className="text-2xl font-bold mb-6 text-slate-100">
               {questions[currentQuestion].question}
             </h2>
 
-            {/* Options */}
             <div className="space-y-3">
               {questions[currentQuestion].options.map((option, index) => (
                 <button
@@ -232,8 +221,8 @@ export default function TestPage() {
                   onClick={() => handleSelectOption(index)}
                   className={`w-full text-left p-4 rounded-lg transition-all duration-200 ${
                     selectedOption === index
-                      ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white'
-                      : 'bg-white/5 hover:bg-white/10 text-gray-100'
+                      ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white'
+                      : 'bg-slate-700/50 hover:bg-slate-700 text-slate-200 border border-slate-600'
                   }`}
                 >
                   <div className="flex items-start">
@@ -246,18 +235,17 @@ export default function TestPage() {
               ))}
             </div>
 
-            {/* Navigation */}
             <div className="mt-8 flex justify-between">
               <button
                 onClick={handleExit}
-                className="px-6 py-3 text-gray-400 hover:text-white transition-colors"
+                className="px-6 py-3 text-slate-400 hover:text-white transition-colors"
               >
                 Exit Test
               </button>
               <button
                 onClick={handleNext}
                 disabled={selectedOption === null}
-                className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-3 px-8 rounded-lg transition-all duration-200"
+                className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-3 px-8 rounded-lg transition-all duration-200"
               >
                 {currentQuestion === questions.length - 1 ? 'Finish' : 'Next →'}
               </button>
@@ -265,13 +253,9 @@ export default function TestPage() {
           </div>
         </div>
 
-        {/* Tips */}
         <div className="max-w-2xl mx-auto mt-8 text-center">
-          <p className="text-gray-400 text-sm">
-            💡 Choose the answer that best reflects your actual workflow
-          </p>
-          <p className="text-gray-500 text-xs mt-2">
-            Not a scientific assessment · For entertainment purposes only
+          <p className="text-slate-500 text-sm">
+            💡 Be honest. The AI knows when you're lying anyway.
           </p>
         </div>
       </div>
